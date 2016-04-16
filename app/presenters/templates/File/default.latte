@@ -1,0 +1,83 @@
+{block content}
+    <h1 n:block=title>File Upload</h1>
+
+    <div id="content">
+        {control placeForm}
+
+        <a href="#" id="browseButton">Select files</a>
+
+        {snippet uploadingFiles}
+            <ul>
+                <li n:foreach="$uploadingFiles as $file">{$file}</li>
+            </ul>
+        {/snippet}
+
+        <a id="redrawLink" class="ajax" n:href="listUpdate!" style="display: none;">Redraw</a>
+    </div>
+{/block}
+
+{block scripts}
+    {include parent}
+
+    <script src="{$basePath}/js/resumable.js"></script>
+    <script>
+        $(function() {
+            var r = new Resumable({
+                target: {link proceedChunk}
+            });
+
+            var refresh = function () {
+                $('#redrawLink').click();
+            };
+            setInterval(function () {
+                refresh();
+            }, 5000);
+
+            r.assignBrowse(document.getElementById('browseButton'));
+
+            r.on('fileSuccess', function (file) {
+                console.debug('fileSuccess', file);
+            });
+            r.on('fileProgress', function (file) {
+                console.debug('fileProgress', file);
+            });
+            r.on('fileAdded', function (file, event) {
+                r.upload();
+                refresh();
+                console.debug('fileAdded', event);
+            });
+            r.on('filesAdded', function (array) {
+                r.upload();
+                refresh();
+                console.debug('filesAdded', array);
+            });
+            r.on('fileRetry', function (file) {
+                console.debug(file);
+            });
+            r.on('fileError', function (file, message) {
+                console.debug('fileError', file, message);
+            });
+            r.on('uploadStart', function () {
+                refresh();
+                console.debug('uploadStart');
+            });
+            r.on('complete', function () {
+                refresh();
+                console.debug('complete');
+            });
+            r.on('progress', function () {
+                refresh();
+                console.debug('progress');
+            });
+            r.on('error', function (message, file) {
+                console.debug('error', message, file);
+            });
+            r.on('pause', function () {
+                console.debug('pause');
+            });
+            r.on('cancel', function () {
+                console.debug('cancel');
+            });
+        })();
+    </script>
+{/block}

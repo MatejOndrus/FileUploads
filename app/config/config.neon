@@ -21,6 +21,15 @@ session:
 
 services:
 	- App\Model\UserManager
+	- App\Model\PlaceRepository
 	- App\Forms\FormFactory
 	- App\Forms\SignFormFactory
+	- App\Forms\PlaceFormFactory
+	- App\ResumableFile\FileMerger
+	fileListManager:
+	    class: App\ResumableFile\FileListManager
+	    arguments: [@session,'resumableFile.fileList']
+	fileLocator:
+	    class: App\ResumableFile\FileLocator
+	    arguments: [%tempDir%]
 	router: App\RouterFactory::createRouter
